@@ -27,6 +27,7 @@ const EEE_SU: usize = 0x4380 & PAGE_MASK;
 const EEE_STAT: usize = 0x4398 & PAGE_MASK;
 const EEER: usize = 0x43A0 & PAGE_MASK;
 
+#[derive(Debug)]
 pub struct DeviceMem {
     memmap: *mut libc::c_void,
 }
@@ -96,6 +97,7 @@ fn get_source_file(name: &str) -> Result<path::PathBuf, String> {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct EeeStatus {
     raw_value: u32,
 }
