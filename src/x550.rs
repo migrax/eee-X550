@@ -20,11 +20,12 @@ use std::os::unix::io::IntoRawFd;
 use std::path;
 use std::ptr;
 
-const PAGE_SIZE: usize = 4096;
+const PAGE_SIZE: usize = 1 << 12;
+const PAGE_MASK: usize = PAGE_SIZE - 1;
 const MAP_OFFSET: i64 = 0x4000;
-const EEE_SU: usize = 0x4380;
-const EEE_STAT: usize = 0x4398;
-const EEER: usize = 0x43A0;
+const EEE_SU: usize = 0x4380 & PAGE_MASK;
+const EEE_STAT: usize = 0x4398 & PAGE_MASK;
+const EEER: usize = 0x43A0 & PAGE_MASK;
 
 pub struct DeviceMem {
     memmap: *mut libc::c_void,
@@ -67,6 +68,19 @@ impl DeviceMem {
 
         Ok(DeviceMem { memmap: mem })
     }
+
+    pub fn get_eee_status(&self) -> EeeStatus {
+        let val: u32 = read_word(self.memmap, EEE_STAT);
+
+        EeeStatus::from_raw(val)
+    }
+}
+
+fn read_word(orig: *const libc::c_void, offset: usize) -> u32 {
+    let ptr = orig as *const u32;
+    assert!(offset < PAGE_SIZE, "offset is out of bounds");
+    
+    unsafe {ptr::read_volatile(ptr.add(offset >> 2)) }
 }
 
 fn get_source_file(name: &str) -> Result<path::PathBuf, String> {
@@ -79,5 +93,23 @@ fn get_source_file(name: &str) -> Result<path::PathBuf, String> {
         Ok(net_dev)
     } else {
         Err(format!("Could not find NIC named {}", name))
+    }
+}
+
+pub struct EeeStatus {
+    raw_value: u32,
+}
+
+impl EeeStatus {
+    fn from_raw(value: u32) -> EeeStatus {
+        EeeStatus { raw_value: value }
+    }
+
+    pub fn get_eee_support(self) -> bool {
+        self.raw_value & 0x2000_0000 != 0
+    }
+
+    pub fn get_tx_lpi_status(self) -> bool {
+        self.raw_value & 0x8000_0000 != 0
     }
 }

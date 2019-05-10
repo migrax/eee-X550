@@ -53,6 +53,11 @@ fn main() {
     let opt = Opt::from_args();
 
     let dev = DeviceMem::from_name(&opt.device).expect("Error accessing device");
+    if opt.stats {
+        let status = dev.get_eee_status();
+        println!("EEE Support is: {}", status.get_eee_support());
+        println!("EEE TX LPI is: {}", status.get_tx_lpi_status());
+    }
 
     println!("Hello, world!");
 }
