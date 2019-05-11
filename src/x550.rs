@@ -17,8 +17,7 @@
 
 use std::fs::OpenOptions;
 use std::os::unix::io::IntoRawFd;
-use std::path;
-use std::ptr;
+use std::{mem, path, ptr};
 
 const PAGE_SIZE: usize = 1 << 12;
 const PAGE_MASK: usize = PAGE_SIZE - 1;
@@ -71,17 +70,24 @@ impl DeviceMem {
     }
 
     pub fn get_eee_status(&self) -> EeeStatus {
-        let val: u32 = read_word(self.memmap, EEE_STAT);
+        let val: u32 = read_register(self.memmap, EEE_STAT);
 
         EeeStatus::from_raw(val)
     }
 }
 
-fn read_word(orig: *const libc::c_void, offset: usize) -> u32 {
-    let ptr = orig as *const u32;
+fn read_register<S, T>(orig: *const S, offset: usize) -> T {
+    let ptr = orig as *const T;
     assert!(offset < PAGE_SIZE, "offset is out of bounds");
-    
-    unsafe {ptr::read_volatile(ptr.add(offset >> 2)) }
+
+    unsafe { ptr::read_volatile(ptr.add(offset / mem::size_of::<T>())) }
+}
+
+fn write_register<S, T>(orig: *mut S, offset: usize, value: T) {
+    let ptr = orig as *mut T;
+    assert!(offset < PAGE_SIZE, "offset is out of bounds");
+
+    unsafe { ptr::write_volatile(ptr.add(offset / mem::size_of::<T>()), value) }
 }
 
 fn get_source_file(name: &str) -> Result<path::PathBuf, String> {
