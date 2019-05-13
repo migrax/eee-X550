@@ -58,11 +58,22 @@ fn main() {
         println!("EEE Support is: {}", status.get_eee_support());
         println!("EEE TX LPI is: {}", status.get_tx_lpi_status());
         println!("EEE TX LPI count: {}", dev.get_tx_lpi_count());
-
-        eprintln!("Status is: {:?}", status);
     }
 
     if let Some(hyst) = opt.hyst {
         println!("Hysteresis set to: {}", dev.set_hysteresis(hyst));
+    }
+
+    if opt.enable || opt.force_enable {
+        dev.enable_lpi(opt.force_enable);
+        println!(
+            "TX LPI enabled {}",
+            if opt.force_enable { "forced" } else { "" }
+        );
+    }
+
+    if opt.disable {
+        dev.disable_lpi();
+        println!("TX LPI disabled");
     }
 }

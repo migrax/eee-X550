@@ -89,6 +89,28 @@ impl DeviceMem {
 
         ((read_register::<_, u32>(self.memmap, EEE_SU) >> 26) & 0xFF) as u8
     }
+
+    pub fn enable_lpi(&self, force: bool) {
+        set_eee_bits(self.memmap, true, force)
+    }
+
+    pub fn disable_lpi(&self) {
+        set_eee_bits(self.memmap, false, false)
+    }
+}
+
+fn set_eee_bits<S>(mem: *mut S, enable: bool, force: bool) {
+    let mut reg: u32 = read_register(mem, EEER);
+
+    reg &= 0xEFFE_FFFF;
+    if enable {
+        reg |= 0x0001_0000;
+    }
+    if force {
+        reg |= 0x1000_0000;
+    }
+
+    write_register(mem, EEER, reg)
 }
 
 fn read_register<S, T>(orig: *const S, offset: usize) -> T {
