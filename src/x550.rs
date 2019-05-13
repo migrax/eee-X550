@@ -83,7 +83,7 @@ impl DeviceMem {
 
     pub fn set_hysteresis(&self, hyst: u8) -> u8 {
         let mut reg: u32 = read_register(self.memmap, EEE_SU);
-        reg &= 0x3FFF_FFFF;
+        reg &= 0x03FF_FFFF;
         reg |= u32::from(hyst) << 26;
         write_register(self.memmap, EEE_SU, reg);
 
