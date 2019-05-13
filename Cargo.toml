@@ -1,7 +1,7 @@
 [package]
 name = "eee_x550"
 description = "A small utility to setup and query EEE capabilities on Intel X550 NICs"
-version = "0.1.0"
+version = "0.9.1"
 authors = ["Miguel Rodríguez Pérez <miguel@det.uvigo.gal>"]
 edition = "2018"
 
