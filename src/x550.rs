@@ -22,6 +22,7 @@ use std::{mem, path, ptr};
 const PAGE_SIZE: usize = 1 << 12;
 const PAGE_MASK: usize = PAGE_SIZE - 1;
 const MAP_OFFSET: i64 = 0x4000;
+const ETLPIC: usize = 0x41F4 & PAGE_MASK;
 const EEE_SU: usize = 0x4380 & PAGE_MASK;
 const EEE_STAT: usize = 0x4398 & PAGE_MASK;
 const EEER: usize = 0x43A0 & PAGE_MASK;
@@ -73,6 +74,11 @@ impl DeviceMem {
         let val: u32 = read_register(self.memmap, EEE_STAT);
 
         EeeStatus::from_raw(val)
+    }
+
+    pub fn get_tx_lpi_count(&self) -> u32 {
+        // The counter is reset every time it is real
+        read_register(self.memmap, ETLPIC)
     }
 }
 

@@ -57,6 +57,7 @@ fn main() {
         let status = dev.get_eee_status();
         println!("EEE Support is: {}", status.get_eee_support());
         println!("EEE TX LPI is: {}", status.get_tx_lpi_status());
+        println!("EEE TX LPI count: {}", dev.get_tx_lpi_count());
 
         eprintln!("Status is: {:?}", status);
     }
