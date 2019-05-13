@@ -61,4 +61,8 @@ fn main() {
 
         eprintln!("Status is: {:?}", status);
     }
+
+    if let Some(hyst) = opt.hyst {
+        println!("Hysteresis set to: {}", dev.set_hysteresis(hyst));
+    }
 }

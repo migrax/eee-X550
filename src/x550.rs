@@ -80,6 +80,15 @@ impl DeviceMem {
         // The counter is reset every time it is real
         read_register(self.memmap, ETLPIC)
     }
+
+    pub fn set_hysteresis(&self, hyst: u8) -> u8 {
+        let mut reg: u32 = read_register(self.memmap, EEE_SU);
+        reg &= 0x3FFF_FFFF;
+        reg |= u32::from(hyst) << 26;
+        write_register(self.memmap, EEE_SU, reg);
+
+        ((read_register::<_, u32>(self.memmap, EEE_SU) >> 26) & 0xFF) as u8
+    }
 }
 
 fn read_register<S, T>(orig: *const S, offset: usize) -> T {
