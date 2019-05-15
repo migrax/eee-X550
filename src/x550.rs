@@ -146,15 +146,15 @@ pub struct EeeStatus {
 }
 
 impl EeeStatus {
-    fn from_raw(value: u32) -> EeeStatus {
+    const fn from_raw(value: u32) -> EeeStatus {
         EeeStatus { raw_value: value }
     }
 
-    pub fn get_eee_support(self) -> bool {
+    pub const fn get_eee_support(self) -> bool {
         self.raw_value & 0x2000_0000 != 0
     }
 
-    pub fn get_tx_lpi_status(self) -> bool {
+    pub const fn get_tx_lpi_status(self) -> bool {
         self.raw_value & 0x8000_0000 != 0
     }
 }
